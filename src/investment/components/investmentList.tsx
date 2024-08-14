@@ -7,7 +7,7 @@ export const InvestmentList: React.FC<IInvestmentListProps> = ({ clientId }) => 
     const isClientView = clientId != null;
     return (
         <List 
-            filters={isClientView ? undefined : SearchFilterInput}
+            filters={SearchFilterInput({ showSearchText: !isClientView, showForecastDate: isClientView })}
             filter={{ clientId }}
         >
             <Datagrid 

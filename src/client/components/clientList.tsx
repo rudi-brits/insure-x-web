@@ -3,7 +3,7 @@ import { SearchFilterInput } from '../../grid/components/searchFilterInput';
 
 export const ClientList = () => { 
     return (
-        <List filters={SearchFilterInput}>
+        <List filters={SearchFilterInput({ showSearchText: true })}>
             <Datagrid 
                 rowClick="show"
                 bulkActionButtons={false}>

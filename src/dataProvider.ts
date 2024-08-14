@@ -12,24 +12,24 @@ export const dataProvider: DataProvider = {
     const filterParams = params.filter;
 
     const query = {
-      filter: filterParams?.q,
+      filter: filterParams?.searchText,
       sortField: field,
       sortOrder: order,
       pageNumber: page,
-      pageSize: perPage
+      pageSize: perPage,
+      forecastDate: undefined
     };
 
     let url;
 
     if (resource === ResourceNames.clients && filterParams?.clientId) {
       url = `${apiUrl}/${ResourceNames.investments}/${resource}/${filterParams.clientId}/${ResourceNames.investments}`;
+      query.forecastDate = filterParams?.forecastDate;
     } else {
       url = `${apiUrl}/${resource}`;
     }
 
     url += `?${stringify(query)}`;
-
-    console.log(url);
 
     return httpClient(url).then(({ json }) => ({
       data: json.data,
