@@ -1,9 +1,9 @@
 import { List, Datagrid, TextField } from 'react-admin';
-import { SearchInput } from '../Search/SearchInput';
+import { SearchFilterInput } from '../../grid/components/searchFilterInput';
 
 export const ClientList = () => { 
     return (
-        <List filters={SearchInput}>
+        <List filters={SearchFilterInput}>
             <Datagrid 
                 rowClick="show"
                 bulkActionButtons={false}>

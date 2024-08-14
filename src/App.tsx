@@ -4,17 +4,18 @@ import {
 } from "react-admin";
 import { Layout } from "./Layout";
 import { dataProvider } from "./dataProvider";
-import { ClientList } from "./Client/ClientList";
-import { ClientShow } from "./Client/ClientShow";
-import { InvestmentList } from "./Investment/InvestmentList";
-import { InvestmentShow } from "./Investment/InvestmentShow";
+import { ClientList } from "./client/components/clientList";
+import { ClientShow } from "./client/components/clientShow";
+import { InvestmentList } from "./investment/components/investmentList";
+import { InvestmentShow } from "./investment/components/investmentShow";
+import { ResourceNames } from "./constants/insure.web.x.constants";
 
 export const App = () => (
   <Admin layout={Layout} dataProvider={dataProvider}>
-    <Resource name="Client"
+    <Resource name={ResourceNames.clients}
       list={ClientList}
       show={ClientShow} />
-    <Resource name="Investment"
+    <Resource name={ResourceNames.investments}
       list={InvestmentList}
       show={InvestmentShow} />
   </Admin>

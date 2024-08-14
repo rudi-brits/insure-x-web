@@ -1,5 +1,5 @@
 import { TextInput } from 'react-admin';
 
-export const SearchInput = [
+export const SearchFilterInput = [
     <TextInput label="Search" source="q" alwaysOn key={"Search"}/>
 ];
