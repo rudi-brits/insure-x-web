@@ -1,3 +1,5 @@
+import { minValue } from "react-admin";
+
 export const getMinForecastDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -10,4 +12,12 @@ const formatDateToYyyyMmDd = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+};
+
+export const minDateValidator = (value) => {
+    const minDate = getMinForecastDate();
+    if (value < minDate) {
+        return false;
+    }
+    return true;
 };

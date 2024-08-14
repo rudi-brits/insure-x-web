@@ -36,15 +36,24 @@ export const dataProvider: DataProvider = {
       total: json.totalRecords,
     }));
   },
-
   getOne: (resource: string, params: GetOneParams<any> & QueryFunctionContext) => {
     const url = `${apiUrl}/${resource}/${params.id}`;
     return httpClient(url).then(({ json }) => ({ data: json }));
   },
+  create: (resource, params) => {
+    const url = `${apiUrl}/${resource}/forecast`;
+    return httpClient(url, {
+      method: 'POST',
+      body: JSON.stringify(params.data),
+    })
+      .then(({ json }) => ({
+        data: json
+      }));
+  },
+
 
   getMany: () => Promise.reject(new Error('Not implemented')),
   getManyReference: () => Promise.reject(new Error('Not implemented')),
-  create: () => Promise.reject(new Error('Not implemented')),
   update: () => Promise.reject(new Error('Not implemented')),
   delete: () => Promise.reject(new Error('Not implemented')),
   updateMany: () => Promise.reject(new Error('Not implemented')),
