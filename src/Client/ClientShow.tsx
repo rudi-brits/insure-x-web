@@ -1,14 +1,14 @@
-import { List, Datagrid, TextField } from 'react-admin';
+import { TextField, SimpleShowLayout, Show } from 'react-admin';
 
 export const ClientShow = () => {
     return (
-        <List>
-            <Datagrid rowClick="edit">
-                <TextField source="Id" />
-                <TextField source="Firstname" />
-                <TextField source="Surname" />
-                <TextField source="IdNumber" />
-            </Datagrid>
-        </List>
+        <Show>
+            <SimpleShowLayout>
+                <TextField source="id" />
+                <TextField source="firstname" />
+                <TextField source="surname" />
+                <TextField source="idNumber" />
+            </SimpleShowLayout>
+        </Show>
     );
 };
