@@ -1,93 +1,86 @@
 import { useEffect, useState } from 'react';
-import { TextField, SimpleShowLayout, Show, DateInput, minValue, SimpleForm, useDataProvider, Toolbar } from 'react-admin';
+import { TextField, SimpleShowLayout, DateInput, SimpleForm, useDataProvider } from 'react-admin';
 import { useParams } from 'react-router-dom';
 import { getMinForecastDate, minDateValidator } from '../../grid/utilities/dateUtilities';
 import { Box } from '@mui/material';
+import { ResourceNames } from '../../constants/insure.web.x.constants';
 
-export const InvestmentShow = () => {
-    let storedDate = localStorage.getItem('selectedDate') ?? getMinForecastDate();
+const EmptyToolbar = () => '';
+const investmentShowForecastDateStorageKey = 'investmentShowForecastDate';
+
+export const InvestmentShow = () => {    
+    let isForecastDateValid = false;
+
+    const forecastDateFromStorage = localStorage.getItem(investmentShowForecastDateStorageKey) ?? getMinForecastDate();  
+    const emptyData = { id: 0 };
 
     const { id } = useParams();
-    const [data, setData] = useState({ id: 0 });
-    const [loading, setLoading] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<string>(storedDate);
+    const [data, setData] = useState(emptyData);
+    const [selectedForecastDate, setSelectedForecastDate] = useState<string>(forecastDateFromStorage);
     const dataProvider = useDataProvider();
 
-    useEffect(() => {
-        if (storedDate) {
-            fetchData(storedDate);
-        }
+    useEffect(() => {        
+        fetchData(forecastDateFromStorage);
     }, []);
 
-    const fetchData = async (date: string) => {
-        setLoading(true);
+    const fetchData = async (forecastDateValue: string) => {        
+        if (!validateForecastDate(forecastDateValue))
+            return;
+
         try {
-            const response = await dataProvider.create('investments', {
-                data: {
-                    id,
-                    forecastDate: date,
-                },
-            });
+            const url = `${ResourceNames.investments}/${id}/forecasts?ForecastDate=${forecastDateValue}`;
+            const response = await dataProvider.getOneByUrl(url);
             setData(response.data);
         } catch (error) {
+            setData(emptyData);
             console.error('Error fetching data:', error);
-            setData({
-                id: 50,
-                clientId: 11,
-                lumpSum: "34 000.00",
-                startDate: "2016-08-18",
-                annualInterestRate: " 6.30",
-                forecastedAmount: " 0.00",
-                interestType: "Compounded Annually",
-                firstname: "Daniel",
-                surname: "Rodriguez"
-            })
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
 
-    let isValid = true;
+    const validateForecastDate = (forecastDate: string) => {
+        isForecastDateValid = minDateValidator(forecastDate);
+        if (isForecastDateValid)
+            setForecastDate(forecastDate);
 
-    const handleDateChange = (e) => {
-        const newDate = e.target.value; 
-        isValid = minDateValidator(newDate); 
-        if (!isValid)
-            return;
-        debugger;
-        setSelectedDate(newDate); 
-        localStorage.setItem('selectedDate', newDate);
-        fetchData(newDate); 
-    };  
+        return isForecastDateValid;
+    };
 
-    console.log(data);
+    const setForecastDate = (forecastDate: string) => {
+        setSelectedForecastDate(forecastDate); 
+        localStorage.setItem(investmentShowForecastDateStorageKey, forecastDate);
+    }
 
-    const EmptyToolbar = () => '';
+    const handleForecastDateChange = (e: any) => {
+        const forecastDate = e.target.value; 
+        fetchData(forecastDate); 
+    };      
 
     return (
         <Box sx={{ backgroundColor: '#1E1E1E', marginTop: 2,  borderRadius: 2 }}>
             <SimpleForm toolbar={<EmptyToolbar />}>
-                <DateInput 
-                    label="Forecast Date" 
-                    source="forecastDate" 
-                    defaultValue={selectedDate || ''}               
-                    onChange={handleDateChange}
-                    parse={(date: Date) => (date ? date.toISOString() : null)}
-                    sx={{ width: 'auto' }}
-                    helperText={`Select a date >= ${getMinForecastDate()}`}
-                />
-                {loading ? (
-                    <p>Loading...</p>
-                ) : data ? (
-                    <SimpleShowLayout record={data}>
-                        <TextField source="firstname" />
-                        <TextField source="surname" />
-                        <TextField source="lumpSum" />
-                        <TextField source="startDate" />
-                        <TextField source="annualInterestRate" />
-                        <TextField source="interestType" />
-                        <TextField source="forecastedAmount" />
-                    </SimpleShowLayout>
+                {data?.id > 0 ? (
+                    <>
+                        <DateInput 
+                            label="Forecast Date"
+                            source="forecastDate"
+                            defaultValue={selectedForecastDate || ''}
+                            onInput={handleForecastDateChange}
+                            parse={(date: Date) => (date ? date.toISOString() : null)}
+                            sx={{ width: 'auto' }}
+                            error={isForecastDateValid}
+                            helperText={isForecastDateValid && `Select a date >= ${getMinForecastDate()}`}
+                            FormHelperTextProps={{ error: true }}
+                        />
+                        <SimpleShowLayout record={data}>
+                            <TextField source="firstname" />
+                            <TextField source="surname" />
+                            <TextField source="lumpSum" />
+                            <TextField source="startDate" />
+                            <TextField source="annualInterestRate" />
+                            <TextField source="interestType" />
+                            <TextField source="forecastedAmount" />
+                        </SimpleShowLayout>
+                    </>
                 ) : (
                     <p>No data available</p>
                 )}
