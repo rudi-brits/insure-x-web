@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
 import { TextField, SimpleShowLayout, DateInput, SimpleForm, useDataProvider } from 'react-admin';
 import { useParams } from 'react-router-dom';
-import { getMinForecastDate, minDateValidator } from '../../grid/utilities/dateUtilities';
+import { getMinForecastDateFormatted, minDateValidator } from '../../grid/utilities/dateUtilities';
 import { Box } from '@mui/material';
 import { ResourceNames } from '../../constants/insure.web.x.constants';
 
 const EmptyToolbar = () => '';
 const investmentShowForecastDateStorageKey = 'investmentShowForecastDate';
 
-export const InvestmentShow = () => {    
-    let isForecastDateValid = false;
+export const InvestmentShow = () => { 
+    const formattedMinForecastDate = getMinForecastDateFormatted();
+    const invalidDateMessage = `Date must be at least ${formattedMinForecastDate}`;
+    const emptyData = { id: 0 };    
+    let forecastDateFromStorage = sessionStorage.getItem(investmentShowForecastDateStorageKey) ?? '';  
 
-    const forecastDateFromStorage = localStorage.getItem(investmentShowForecastDateStorageKey) ?? getMinForecastDate();  
-    const emptyData = { id: 0 };
+    if (!minDateValidator(forecastDateFromStorage)) 
+        forecastDateFromStorage = formattedMinForecastDate;
 
     const { id } = useParams();
     const [data, setData] = useState(emptyData);
-    const [selectedForecastDate, setSelectedForecastDate] = useState<string>(forecastDateFromStorage);
+    const [selectedForecastDate, setSelectedForecastDate] = useState(forecastDateFromStorage);
+    const [isForecastDateValid, setIsForecastDateValid] = useState(false);
     const dataProvider = useDataProvider();
 
     useEffect(() => {        
@@ -38,16 +42,17 @@ export const InvestmentShow = () => {
     };
 
     const validateForecastDate = (forecastDate: string) => {
-        isForecastDateValid = minDateValidator(forecastDate);
-        if (isForecastDateValid)
+        const isValid = minDateValidator(forecastDate);
+        if (isValid)
             setForecastDate(forecastDate);
 
-        return isForecastDateValid;
+        setIsForecastDateValid(isValid);
+        return isValid;
     };
 
     const setForecastDate = (forecastDate: string) => {
         setSelectedForecastDate(forecastDate); 
-        localStorage.setItem(investmentShowForecastDateStorageKey, forecastDate);
+        sessionStorage.setItem(investmentShowForecastDateStorageKey, forecastDate);
     }
 
     const handleForecastDateChange = (e: any) => {
@@ -67,8 +72,8 @@ export const InvestmentShow = () => {
                             onInput={handleForecastDateChange}
                             parse={(date: Date) => (date ? date.toISOString() : null)}
                             sx={{ width: 'auto' }}
-                            error={isForecastDateValid}
-                            helperText={isForecastDateValid && `Select a date >= ${getMinForecastDate()}`}
+                            error={!isForecastDateValid}
+                            helperText={!isForecastDateValid && invalidDateMessage}
                             FormHelperTextProps={{ error: true }}
                         />
                         <SimpleShowLayout record={data}>

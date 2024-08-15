@@ -1,7 +1,14 @@
-export const getMinForecastDate = () => {
+const dateRegex = /^\d{4}-\d{1,2}-\d{1,2}$/;
+
+const getMinForecastDateRaw = () => {
     const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return formatDateToYyyyMmDd(tomorrow);
+    return tomorrow;
+}
+
+export const getMinForecastDateFormatted = () => {
+    return formatDateToYyyyMmDd(getMinForecastDateRaw());
 };
 
 const formatDateToYyyyMmDd = (date: Date) => {
@@ -13,6 +20,17 @@ const formatDateToYyyyMmDd = (date: Date) => {
 };
 
 export const minDateValidator = (value: string) => {
-    const minDate = getMinForecastDate();
-    return value >= minDate;
+    if (!dateRegex.test(value)) {
+        return false;
+    }
+
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+        return false;
+    }
+
+    date.setHours(0, 0, 0, 0);
+    const minDate = getMinForecastDateRaw();
+
+    return date >= minDate;
 };

@@ -1,5 +1,5 @@
 import { DateInput, minValue, TextInput } from 'react-admin';
-import { getMinForecastDate } from '../utilities/dateUtilities';
+import { getMinForecastDateFormatted } from '../utilities/dateUtilities';
 import { ISearchFilterInputProps } from '../models/searchFilterInputProps';
 
 export const SearchFilterInput = (props: ISearchFilterInputProps) => {
@@ -15,7 +15,7 @@ export const SearchFilterInput = (props: ISearchFilterInputProps) => {
                 label="Forecast Date" 
                 source="forecastDate" 
                 key="forecastDate" 
-                validate={minValue(getMinForecastDate())} 
+                validate={minValue(getMinForecastDateFormatted())} 
                 parse={(date: Date) => (date ? date.toISOString() : null)}
             />
         );
